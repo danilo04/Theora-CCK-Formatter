@@ -1,0 +1,104 @@
+<?php
+//$Id$
+
+/**
+ * @file
+ *
+ * Is a CCK formatter for filefield fields wich just add the HTML 5 code to embeded a video or audio.
+ */
+
+/**
+ * Implementation of hook_field_formatter_info().
+ */
+function theora_formatter_field_formatter_info() {
+  $formatters = array(
+    "theora" => array(
+      "label" => t("Theora video and audio format"),
+      "field types" => array('filefield'),
+    ),
+  );
+  return $formatters;
+}
+
+/**
+ * Implementation of hook_theme().
+ */
+function theora_formatter_theme() {
+  return array(
+    'theora_formatter' => array(
+        "arguments" => array("item" => NULL)
+    ),
+     'theora_formatter_formatter_theora' => array(
+        "arguments" => array("element" => NULL)
+    ),
+  );
+}
+
+/**
+ * 
+ * @param $element
+ * @return unknown_type
+ */
+function theme_theora_formatter_formatter_theora($element) {
+  if (isset($element['#item']['nid']) && $node = node_load($element['#item']['nid'])) {
+    return theora_formatter_field_formatter($element['#field_name'], $element['#item'], $element['#formatter'], $node);
+  }
+}
+
+/**
+ * Implementation of hook_field_formatter().
+ *
+ * @param $field
+ * @param $item
+ * @param $formatter
+ * @param $node
+ * @return string
+ */
+function theora_formatter_field_formatter($field, $item, $formatter, $node) {
+  if (is_string($item['data'])) {
+    $item['data'] = unserialize($item['data']);
+  }
+  if (!isset($item['filepath'])) {
+    $file = field_file_load($item['fid']);
+    $item['filepath'] = $file['filepath'];
+  }
+  $item['filepath'] = base_path() . $item['filepath'];
+  $item['type'] = _theora_formatter_get_extension($item);
+  return theme('theora_formatter', $item);
+}
+
+
+/**
+ * Get the extension of the file
+ * @param $item
+ * @return string 
+ *          Return the extension of the file
+ */
+function _theora_formatter_get_extension($item) {
+  preg_match("/\.(\w*)$/", $item['filepath'], $extension);
+  return isset($extension[1]) ? $extension[1] : "";
+}
+
+/**
+ * Return the html to present the video
+ * 
+ * @param $item
+ * @return string
+ */
+function theme_theora_formatter($item) {
+  $output = "";
+  $msg = t('Descarga el archivo: <a href="@filepath">@filepath</a>. 
+            Más información sobre browsers que soportan formatos Ogg en la página <a href="@page">@page</a>',
+          array("@filepath" => $item['filepath'], "@page" => "http://en.wikipedia.org/wiki/Use_of_Ogg_formats_in_HTML5"));
+  switch ($item['type']) {
+    case 'ogv':
+      $output .= sprintf('<video src="%s" controls>%s</video>', $item['filepath'], $msg);
+      break;
+    case 'ogg':
+    case 'oga':
+      $output .= sprintf('<audio src="%s" controls>%s</audio>', $item['filepath'], $msg);
+      break;
+    default: $output .= $msg;
+  }
+  return $output;
+}

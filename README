@@ -1,0 +1,14 @@
+Install
+----------------------------------------
+
+1. Run the deploy.sh script to generate the package in the folder target.
+2. Install the package like another module in drupal. Note: it depends on filefield module.
+3. Create a cck filefield field in your content type.
+4. Select display fields of your content type and choose Theora video and audio format.
+
+
+Restrictions
+---------------------------------------
+The module just  work with browsers wich support Ogg video with HTML5. To consider 
+that Theora format (ogg) was dropped of the HTML5 specification.
+More information in http://en.wikipedia.org/wiki/Use_of_Ogg_formats_in_HTML5

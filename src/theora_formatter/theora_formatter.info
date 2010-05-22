@@ -1,0 +1,6 @@
+; $Id$
+name = Theora Formatter
+description = Is a CCK formatter for filefield fields wich just add the HTML 5 code to embeded a video or audio
+core = 6.x
+
+dependencies[] = filefield
